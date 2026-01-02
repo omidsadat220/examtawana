@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class NewQuestion extends Model
+{
+    protected $guarded = [];
+
+      public function department(){
+        return $this->belongsTo(department::class, 'department_id');
+    }
+
+    public function subject(){
+        return $this->belongsTo(DepartmentSubject::class, 'subject_id');
+    }
+
+}

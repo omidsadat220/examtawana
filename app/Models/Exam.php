@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Exam extends Model
+{
+    protected $fillable = [
+        'teacher_id',
+        'department_id',
+        'subject_id',
+        'exam_title',
+        'start_time',
+        'is_active',
+    ];
+
+    public function department()
+    {
+        return $this->belongsTo(department::class, 'department_id');
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(DepartmentSubject::class, 'subject_id');
+    }
+
+    
+}

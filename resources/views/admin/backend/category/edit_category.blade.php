@@ -1,0 +1,78 @@
+@extends('admin.admin_dashboard')
+@section('admin')
+    <div class="container-fluid pt-4 px-4">
+        <div class="row bg-secondary">
+            <div class="col-12 text-center">
+
+                <div class="form-container container-form" id="add-category-page" style="display: block;">
+                    <!-- Back Button -->
+                      <div class="d-flex flex-row justify-content-between">
+                        <h4 class="text-white">Edit Category</h4>
+                        <a href="{{ route('all.category') }}" class="back-link d-block text-start" id="backBtn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg" style="cursor: pointer">
+                                <path d="M15 6L9 12L15 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round"></path>
+                            </svg>
+                            Back to Categories
+                        </a>
+                    </div>
+
+                    <!-- Form Card -->
+                    <div class="col-12  mx-auto">
+                        <div class="bg-secondary rounded h-100 p-4">
+                            <form id="categoryForm" action="{{ route('update.category', $category->id) }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="cat_id" value="{{ $category->id }}">
+
+                                <div class="row mb-4">
+                                    <label for="uni_name" class="col-sm-2 col-form-label fw-semibold">University
+                                        Name</label>
+                                    <div class="col-sm-10 col-lg-4 mb-3 mb-lg-0">
+                                        <input class="form-control catinput " type="text" id="uni_name" name="uni_name"
+                                            value="{{ $category->uni_name }}" placeholder="Enter university name..."
+                                            required>
+                                    </div>
+
+                                    <label for="timer" class="col-sm-2 col-form-label">Timer (Minutes)</label>
+                                    <div class="col-sm-10 col-lg-4">
+                                        <select name="timer" id="timer" class="form-select catinput">
+                                            <option value="5" {{ $category->timer == 5 ? 'selected' : '' }}>5 Minutes</option>
+                                            <option value="10" {{ $category->timer == 10 ? 'selected' : '' }}>10 Minutes</option>
+                                            <option value="20" {{ $category->timer == 20 ? 'selected' : '' }}>20 Minutes</option>
+                                            <option value="30" {{ $category->timer == 30 ? 'selected' : '' }}>30 Minutes</option>
+                                            <option value="40" {{ $category->timer == 40 ? 'selected' : '' }}>40 Minutes</option>
+                                            <option value="50" {{ $category->timer == 50 ? 'selected' : '' }}>50 Minutes</option>
+                                            <option value="60" {{ $category->timer == 60 ? 'selected' : '' }}>60 Minutes</option>
+                                        </select>
+                                    </div>
+
+                                    {{-- <label for="code" class="col-sm-2 col-form-label fw-semibold">Code</label>
+                                    <div class="col-sm-10 col-lg-4">
+                                        <input class="form-control catinput" type="text" id="code" name="code"
+                                            value="{{ $category->code }}" placeholder="Enter category code..." required>
+                                    </div> --}}
+                                </div>
+
+                                <div class="row">
+                                    {{-- <label class="col-sm-2 col-form-label fw-semibold" for="active">Active</label>
+                                    <div class="col-sm-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input catinput" type="checkbox" id="active"
+                                                name="active" value="1" {{ $category->active ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="active">Yes</label>
+                                        </div>
+                                    </div> --}}
+                                    <div class="col-12 text-end">
+                                        <button style="--clr: #39ff14" type="submit" class="button-styleee">
+                                            <span>Save Category</span><i></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+@endsection

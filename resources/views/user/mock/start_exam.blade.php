@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced Online Exam System with Images</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Favicon -->
+    <link href="{{ asset('backend/assets/img/fav4.png') }}" rel="icon" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+        * { font-family: "Inter", sans-serif; }
+        body { background-color: rgb(38, 38, 38); min-height: 100vh; color: #e2e8f0; }
+        .gradient-border { position: relative; background: rgb(38, 38, 38); border-radius: 16px; padding: 1px; }
+        .gradient-border::before { content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 16px; padding: 2px; background: rgb(38, 38, 38); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+        .option-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(99, 241, 106, 0.3); }
+        .question-number { transition: all 0.3s ease; }
+        .question-number:hover { transform: scale(1.1); background: linear-gradient(135deg, #63f176 0%, #050505 100%); }
+        .question-image { transition: all 0.3s ease; cursor: zoom-in; }
+        .question-image:hover { transform: scale(1.02); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); }
+        .image-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { max-width: 90%; max-height: 90%; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        .pulse { animation: pulse 2s infinite; }
+        .floating-particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+        .particle { position: absolute; width: 4px; height: 4px; background: #00ff88; border-radius: 50%; opacity: 0; animation: float linear infinite; }
+        @keyframes float { 0% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-50px) rotate(360deg); opacity: 0; } }
+        .bg-img { background-image: url("{{ asset('assets/img/hb.png') }}"); background-position: center; background-size: cover; }
+        .bg-gray { background-color: #373737; }
+        .bg-in-gray { background-color: #252525; }
+
+        .option-hover {
+            display: flex;
+            align-items: center;
+            background-color: #373737;
+            border-radius: 12px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            position: relative; /* مهم برای دایره انتخاب */
+        }
+
+        .option-hover input[type="radio"] {
+            position: absolute; /* روی باکس مخفی شود */
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .option-hover .w-3 {
+            transition: opacity 0.2s ease;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen py-8 px-4">
+
+    <!-- Image Modal -->
+    <div id="imageModal" class="image-modal">
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="" class="w-full h-full object-contain" />
+        </div>
+        <button onclick="closeModal()"
+            class="absolute top-4 right-4 text-white text-2xl bg-gray-800 p-2 rounded-full hover:bg-gray-700">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="gradient-border mb-8">
+            <div class="bg-img rounded-2xl p-6 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-green-600 opacity-10 rounded-full -translate-x-16 -translate-y-16"></div>
+                <div class="absolute bottom-0 left-0 w-40 h-40 bg-green-600 opacity-10 rounded-full translate-x-20 translate-y-20"></div>
+                <div class="flex flex-col md:flex-row justify-between items-center relative z-10">
+                    
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold bg-gradient-to-r from-green-400 to-green-700 bg-clip-text text-transparent">
+                            Tawana Technology Exam Center
+                        </h1>
+                        <p class="text-gray-400 mt-2">{{ $exam->subject->subject_name ?? 'N/A' }}</p>
+
+                    </div>
+                    <div class="flex items-center space-x-4 mt-4 md:mt-0">
+                        <div class="flex items-center mt-5">
+                            <div class="w-3 h-3 bg-green-400 rounded-full mr-2 mt-5 animate-pulse"></div>
+                            <span class="text-sm text-green-400 mt-5">Online</span>
+                            
+
+                        </div>
+                        {{-- <div class="text-gray-400 text-sm">
+                            <i class="far fa-clock mr-1"></i> <span id="timer">45:00</span>
+                        </div> --}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exam Form -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                
+                <div class="lg:col-span-9 order-1 lg:order-1">
+                    <form method="POST" action="{{ route('mock.exam.submit', $exam->id) }}" id="examForm">
+                        @csrf
+                        <div class="gradient-border">
+                            <div class="bg-gray rounded-2xl p-6 md:p-8 relative overflow-hidden">
+                                @foreach ($questions as $index => $item)
+                                    <div class="question-block gradient-border mb-8"
+                                        data-index="{{ $index }}"
+                                        style="{{ $index == 0 ? '' : 'display:none;' }}">
+                                        <div class="bg-in-gray rounded-xl p-6">
+                                            <h2 class="text-xl font-semibold text-white mb-4">
+                                                <span class="text-green-400 font-bold">Q{{ $index + 1 }}.</span>
+                                                {{ $item->question }}
+                                            </h2>
+
+
+                                            @if($item->image)
+                                                <img src="{{ asset($item->image) }}"
+                                                    alt="Question Image"
+                                                    class="question-image mb-4 w-full max-w-md cursor-pointer"
+                                                    onclick="openModal('{{ asset($item->image) }}')" />
+                                            @endif
+
+                                            <div class="space-y-4">
+                                                @for ($i = 1; $i <= 4; $i++)
+                                                    @php
+                                                        $option = 'option' . $i;
+                                                        $label = chr(64 + $i);
+                                                    @endphp
+                                                    <label
+                                                        class="option-hover flex items-center bg-gray rounded-xl p-4 cursor-pointer transition-all hover:bg-gray-700">
+                                                        <input type="radio"
+                                                            name="answers[{{ $item->id }}]"
+                                                            value="{{ $item->$option }}"
+                                                            class="hidden" required />
+                                                        <div
+                                                            class="w-6 h-6 rounded-full border-2 border-gray-600 flex items-center justify-center mr-3">
+                                                            <div class="w-3 h-3 rounded-full bg-green-500 opacity-0"></div>
+                                                        </div>
+                                                        <span class="text-gray-300 flex-1">{{ $item->$option }}</span>
+                                                        <span class="text-xs text-gray-500 ml-2">{{ $label }}</span>
+                                                    </label>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+
+                                <div class="flex flex-wrap justify-between mt-8 gap-3">
+                                    <button type="button" id="prevBtn"
+                                        class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all mr-3"
+                                        style="display:none;">
+                                        Previous
+                                    </button>
+
+                                    <button type="button" id="nextBtn"
+                                        class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all">
+                                        Next
+                                    </button>
+
+                                    <button type="submit" id="submitBtn"
+                                        class="px-6 py-3 bg-gradient-to-r from-green-600 to-dark-600 text-white rounded-lg hover:from-dark-700 hover:to-green-700 transition-all duration-300 flex items-center pulse"
+                                        style="display:none;">
+                                        Submit Exam <i class="fas fa-paper-plane ml-2"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Sidebar -->
+                   <div class="lg:col-span-3 order-2 lg:order-2">
+                        <div class="relative sticky top-6 rounded-2xl bg-[#11860f] shadow-md">
+                            <div class="p-5 rounded-2xl bg-[#198754]"> <!-- فقط p-5 به جای p-4 -->
+                                <div class="d-flex justify-content-between align-items-center mb-5">
+                                    <h3 class="text-sm font-weight-semibold mb-0">
+                                        <i class="fas fa-list-ol text-purple-300 mr-2"></i>
+                                        Questions
+                                    </h3>
+                                    <div class="timer-container text-right" style="margin-top: -20px;">
+                                        <h3 class="mb-0">Time Left: <span id="exam-timer">00:00</span></h3>
+                                    </div>
+                                </div>
+                                
+                                <!-- Numbers -->
+                                <div class="grid grid-cols-5 gap-2 mb-3">
+                                    @foreach($questions as $index => $item)
+                                        <div 
+                                            class="q-number {{ $index == 0 ? 'bg-green-600' : 'bg-gray-700' }} text-white text-sm flex justify-center items-center rounded-md py-1.5 cursor-pointer"
+                                            data-index="{{ $index }}">
+                                            @if($item->image)
+                                                <i class="fas fa-image fa-xs"></i>
+                                            @else
+                                                {{ $index + 1 }}
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                <!-- Stats -->
+                                <div class="p-4 rounded-xl bg-[#1e293b]">
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-xs text-gray-400">Answered:</span>
+                                        <span id="answeredCount" class="text-xs text-green-400">0 questions</span>
+                                    </div>
+                                    <div class="flex justify-between mb-2">
+                                        <span class="text-xs text-gray-400">With Images:</span>
+                                        <span id="withImagesCount" class="text-xs text-blue-400">0 questions</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-xs text-gray-400">Remaining:</span>
+                                        <span id="remainingCount" class="text-xs text-yellow-400">0 questions</span>
+                                    </div>
+                                </div>
+
+                                <!-- Button -->
+                                <!--<button-->
+                                <!--    class="w-full mt-3 py-2.5 bg-gradient-to-r from-green-600 to-emerald-700 text-white text-sm font-medium rounded-lg hover:from-green-700 hover:to-emerald-800 transition-all duration-300 flex items-center justify-center gap-2">-->
+                                <!--    <i class="fas fa-paper-plane text-xs"></i> Finish Exam-->
+                                <!--</button>-->
+                            </div>
+                        </div>
+                    </div>
+
+            </div>
+
+
+    </div>
+
+    <div class="floating-particles" id="particles"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // تایمر امتحان
+            const timerElement = document.getElementById('exam-timer');
+            const examForm = document.getElementById('examForm');
+            const durationMinutes = {{ $exam->start_time ?? 30 }};
+            const durationSeconds = durationMinutes * 60;
+
+            let time = localStorage.getItem('examTime');
+            if (time === null) {
+                time = durationSeconds;
+            } else {
+                time = parseInt(time);
+            }
+
+            function updateTimer() {
+                let minutes = Math.floor(time / 60);
+                let seconds = time % 60;
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+                timerElement.textContent = `${minutes}:${seconds}`;
+
+                if (time <= 0) {
+                    clearInterval(timerInterval);
+                    localStorage.removeItem('examTime');
+                    alert('Time is over! Your answers will be submitted.');
+                    examForm.submit();
+                } else {
+                    time--;
+                    localStorage.setItem('examTime', time);
+                }
+            }
+
+            updateTimer();
+            const timerInterval = setInterval(updateTimer, 1000);
+
+            // مودال تصویر
+            window.openModal = function(src) {
+                document.getElementById('modalImage').src = src;
+                document.getElementById('imageModal').style.display = 'flex';
+            }
+
+            window.closeModal = function() {
+                document.getElementById('imageModal').style.display = 'none';
+            }
+
+            // ایجاد ذرات شناور
+            function createParticles(count = 50) {
+                const container = document.getElementById("particles");
+                container.innerHTML = "";
+                for (let i = 0; i < count; i++) {
+                    const p = document.createElement("div");
+                    p.className = "particle";
+                    p.style.left = Math.random() * 100 + "%";
+                    p.style.animationDelay = Math.random() * 5 + "s";
+                    p.style.animationDuration = Math.random() * 3 + 3 + "s";
+                    container.appendChild(p);
+                }
+            }
+            createParticles(20);
+
+            // انتخاب گزینه‌ها و استایل آن‌ها
+            document.querySelectorAll('.option-hover').forEach(box => {
+                box.addEventListener('click', function() {
+                    const radio = this.querySelector('input[type="radio"]');
+                    if (radio) radio.checked = true;
+
+                    const allOptions = this.closest('.space-y-4').querySelectorAll('.option-hover');
+                    allOptions.forEach(option => {
+                        option.classList.remove('bg-green-600');
+                        const circle = option.querySelector('.w-3');
+                        if (circle) circle.style.opacity = '0';
+                    });
+
+                    this.classList.add('bg-green-600');
+                    const circle = this.querySelector('.w-3');
+                    if (circle) circle.style.opacity = '1';
+
+                    updateStats();
+                });
+            });
+
+            // بروزرسانی آمار
+            function updateStats() {
+                const blocks = document.querySelectorAll(".question-block");
+                let answered = 0;
+                let withImages = 0;
+
+                blocks.forEach((block, index) => {
+                    const checked = block.querySelector('input[type="radio"]:checked');
+                    const qNum = document.querySelectorAll(".q-number")[index];
+
+                    if (checked) {
+                        answered++;
+                        if (qNum) {
+                            qNum.classList.add("bg-green-600");
+                            qNum.classList.remove("bg-gray-700");
+                        }
+                    } else {
+                        if (qNum) {
+                            qNum.classList.remove("bg-green-600");
+                            qNum.classList.add("bg-gray-700");
+                        }
+                    }
+
+                    if (block.querySelector("img")) withImages++;
+                });
+
+                const remaining = blocks.length - answered;
+
+                document.getElementById("answeredCount").textContent = answered + " questions";
+                document.getElementById("withImagesCount").textContent = withImages + " questions";
+                document.getElementById("remainingCount").textContent = remaining + " questions";
+            }
+
+            updateStats();
+
+            document.querySelectorAll("input[type='radio']").forEach(input => {
+                input.addEventListener("change", updateStats);
+            });
+
+            // مدیریت سوال‌ها، دکمه‌های بعدی و قبلی و شماره‌های سایدبار
+            let current = 0;
+            const blocks = document.querySelectorAll(".question-block");
+            const nextBtn = document.getElementById("nextBtn");
+            const prevBtn = document.getElementById("prevBtn");
+            const submitBtn = document.getElementById("submitBtn");
+
+            function showQuestion(index) {
+                blocks.forEach((b, i) => {
+                    b.style.display = i === index ? "block" : "none";
+                });
+
+                prevBtn.style.display = index === 0 ? "none" : "inline-block";
+                nextBtn.style.display = index === blocks.length - 1 ? "none" : "inline-block";
+                submitBtn.style.display = index === blocks.length - 1 ? "inline-block" : "none";
+
+                current = index;
+            }
+
+            // نمایش سوال اول
+            showQuestion(0);
+
+            nextBtn.addEventListener("click", () => {
+                if (current < blocks.length - 1) {
+                    showQuestion(current + 1);
+                }
+                updateStats();
+            });
+
+            prevBtn.addEventListener("click", () => {
+                if (current > 0) {
+                    showQuestion(current - 1);
+                }
+                updateStats();
+            });
+
+            // کلیک روی شماره‌ها
+            const qNumbers = document.querySelectorAll(".q-number");
+            qNumbers.forEach((num, index) => {
+                num.addEventListener("click", () => {
+                    showQuestion(index);
+                    updateStats();
+                });
+            });
+
+            // جلوگیری از رفرش
+            document.addEventListener('keydown', function(e) {
+                if (e.key === "F5" || 
+                    ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r") || 
+                    ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "r")) {
+                    e.preventDefault();
+                    alert("Refresh is disabled during the exam!");
+                }
+            });
+        });
+</script>
+
+
+</body>
+
+</html>
