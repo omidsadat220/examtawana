@@ -19,7 +19,7 @@
                     </div>
 
                     <!-- Form Card -->
-                    <div class="col-12  mx-auto">
+                    <div class="col-12 mx-auto">
                         <div class="bg-secondary rounded h-100 p-4">
                             <form id="categoryForm" action="{{ route('update.category', $category->id) }}" method="POST">
                                 @csrf

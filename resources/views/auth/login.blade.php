@@ -1142,6 +1142,8 @@
                         <p class="text-gray-400">Sign in to your account</p>
                     </div>
 
+                    
+
                     <div class="input-group">
                         <input type="email" id="loginEmail" name="email" class="input-field"
                             placeholder="Enter your email" style="background-color: transparent" />
@@ -1189,8 +1191,7 @@
 
 
                         </label>
-                        <a href="{{ url('/forgot-password') }}" style="color:rgb(34, 197, 94)">Forgot Password?</a>
-
+                       <a href="{{ url('/forgot-password') }}" class="text-sm text-green-500 hover:text-green-400">Forgot Password?</a>
                         {{-- <a id="forgotPasswordBtn"
                             class="text-sm text-green-500 hover:text-green-400 link-hover font-medium"
                             onclick="showPage('forgotPasswordPage')">

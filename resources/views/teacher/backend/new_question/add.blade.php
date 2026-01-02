@@ -9,7 +9,7 @@
         <div class="row bg-secondary">
             <div class="col-12 text-center">
                 <div class="form-container container-form" id="add-category-page" style="display: block;">
-                    <div class="d-flex flex-row justify-content-around">
+                    <div class="d-flex flex-row justify-content-between">
                         <h3 class="text-white">Add New Question</h3>
                         <a href="{{ route('all.teacher.new.question') }}" class="back-link d-block text-start" id="backBtn">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -24,7 +24,7 @@
                     <form action="{{ route('store.teacher.new.question') }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
-                        <div class="container text-start p-4 bg-secondary rounded ">
+                        <div class="container text-start p-3 bg-secondary rounded ">
 
                             <div class="row mb-3 pt-3 align-items-center">
                                 <label for="department-dropdown"
@@ -41,7 +41,7 @@
                             </div>
 
 
-                            <div class="row mb-3 pt-3 align-items-center">
+                            <div class="row mb-3 pt-2 align-items-center">
                                 <label for="subject-dropdown" class="col-sm-2 col-form-label text-white">Subject</label>
                                 <div class="col-sm-10">
                                     <select name="subject_id" class="form-select" id="subject-dropdown">
