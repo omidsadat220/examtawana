@@ -17,7 +17,7 @@ $currectAnsower = App\Models\CorrectAns::where('correct_answer', 'correct_answer
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: linear-gradient(135deg, #007bff, #0056d2);
+    background: linear-gradient(135deg, #38b104ff, #076f04ff);
     color: #fff !important;
     padding: 10px 22px;
     font-size: 16px;
@@ -29,7 +29,7 @@ $currectAnsower = App\Models\CorrectAns::where('correct_answer', 'correct_answer
     transition: all 0.3s ease;
 }
 .dashboard-btn:hover {
-    background: linear-gradient(135deg, #0056d2, #0041a8);
+    background: linear-gradient(135deg, #00ff15ff, #24db04ff);
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(0, 91, 234, 0.4);
 }
