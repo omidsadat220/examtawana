@@ -316,6 +316,19 @@
             user-select: none;
         }
 
+        table{
+            border: 1px solid white;
+        }
+        table tr{
+            border: 1px solid white;
+        }
+        table tr td{
+            border: 1px solid white;
+        }
+        table tr th{
+            border: 1px solid white;
+        }
+
         /* Responsive tweaks */
         @media (max-width: 1024px) {
             body {
@@ -719,7 +732,34 @@
         <img src="https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/0ad2cb31-e920-484f-a8e0-0cd5b072859d.png"
             alt="Four diverse smiling students sitting in a row at computer desks in an exam center, grayscale photo"
             class="banner-image" />
-        <div class="banner-text-area">Online Exam Made Easy</div>
+        <div class="banner-text-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Score</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        @foreach($topUsers as $user)
+                            <td><img src="{{ asset($user->photo) }}" 
+                                style="width:40px;height:40px;border-radius:50%;border:2px solid white;">
+                            </td>
+                            <td>{{ $user->name }}</td>
+                            <td>{{ $user->score }}/{{ $user->total_questions }}</td>
+                            <td>
+                                {{ \Carbon\Carbon::parse($user->exam_date)->format('Y-m-d H:i') }}
+
+                            </td>
+                        @endforeach
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
     <div class="option">

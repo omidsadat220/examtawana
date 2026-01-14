@@ -4,6 +4,7 @@ namespace App\Http\Controllers\user;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\CorrectAns;
@@ -25,9 +26,31 @@ use App\Models\VoucherCode;
 
 class UserController extends Controller
 {
-    public function UserDashboard()
-    {
-        return view('user.dashboard');
+    public function UserDashboard(){
+        $topUsers = DB::table('users')
+            ->join('user_answers', 'users.id', '=', 'user_answers.user_id')
+            ->select(
+                'users.id',
+                'users.name',
+                'users.photo',
+
+                // نمره (تعداد جواب‌های درست)
+                DB::raw('SUM(CASE 
+                    WHEN user_answers.selected_answer = user_answers.correct_answer 
+                    THEN 1 ELSE 0 END) as score'),
+
+                // تعداد کل سوالات
+                DB::raw('COUNT(user_answers.id) as total_questions'),
+
+                // تاریخ آخرین پاسخ کاربر
+                DB::raw('MAX(user_answers.created_at) as exam_date')
+            )
+            ->groupBy('users.id', 'users.name', 'users.photo')
+            ->orderByDesc('score')
+            ->limit(3)
+            ->get();
+
+        return view('user.dashboard', compact('topUsers'));
     }
 
     public function UserLogout(Request $request)

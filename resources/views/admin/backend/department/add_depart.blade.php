@@ -74,6 +74,7 @@
                                     + Add Subject
                                 </button>
                             </div>
+                            <button type="submit">Submit</button>
 
                         </div>
 
