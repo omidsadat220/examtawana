@@ -50,7 +50,9 @@ class UserController extends Controller
             ->limit(3)
             ->get();
 
-        return view('user.dashboard', compact('topUsers'));
+            $forceChange = auth()->user()->password === '1';
+
+        return view('user.dashboard', compact('topUsers', 'forceChange'));
     }
 
     public function UserLogout(Request $request)
@@ -527,5 +529,19 @@ public function MockExamStart($exam_id)
 
         return view('user.certificate.index', compact('certificates'));
     }
+
+    //
+    public function forceUpdate(Request $request){
+        $request->validate([
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        auth()->user()->update([
+            'password' => bcrypt($request->password),
+        ]);
+
+        return redirect()->back();
+    }
+
 
 }

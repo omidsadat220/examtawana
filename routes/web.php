@@ -343,6 +343,9 @@ Route::middleware(['auth', 'role:user'])->group(function () {
         Route::get('/mock/exam/start/{id}' , 'MockExamStart')->name('mock.exam.start');
         Route::post('/mock/exam/submit/{id}' , 'MockExamSubmit')->name('mock.exam.submit');
         Route::get('/mock/exam/results/{exam}',  'examResults')->name('mock.exam.results');
+
+        Route::post('/force-password-update','forceUpdate')->name('password.update.force');
+
     });
 });
 

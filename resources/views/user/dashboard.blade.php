@@ -329,6 +329,47 @@
             border: 1px solid white;
         }
 
+        .force-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.force-modal {
+    max-width: 400px;
+    width: 100%;
+    padding: 2rem;
+    background: #1f1f1f;
+    border-radius: 1rem;
+    transform: scale(1.05);
+    box-shadow: 0 0px 20px rgba(76, 175, 80, 0.5);
+}
+
+.force-input {
+    background: #121212;
+    border: 1px solid #4caf50;
+    color: #e0e0e0;
+}
+
+.force-input:focus {
+    background: #121212;
+    color: #fff;
+    border-color: #2e7d32;
+    box-shadow: none;
+}
+
+.force-btn {
+    background: linear-gradient(135deg, #4caf50, #2e7d32);
+    border: none;
+    color: #fff;
+    font-weight: 700;
+}
+
+
         /* Responsive tweaks */
         @media (max-width: 1024px) {
             body {
@@ -726,6 +767,34 @@
             </div>
         </div>
     </header>
+
+    @if($forceChange)
+        <div class="force-modal-backdrop">
+            <div class="force-modal card-custom">
+                <h4 class="mb-3 text-center" style="color:#4caf50">
+                    🔐 Change Your Password
+                </h4>
+
+                <form method="POST" action="{{ route('password.update.force') }}">
+                    @csrf
+
+                    <input type="password" name="password"
+                        class="form-control mb-3 force-input"
+                        placeholder="New Password" required>
+
+                    <input type="password" name="password_confirmation"
+                        class="form-control mb-4 force-input"
+                        placeholder="Confirm Password" required>
+
+                    <button class="btn force-btn w-100">
+                        Update Password
+                    </button>
+                </form>
+            </div>
+        </div>
+    @endif
+
+
 
     <!-- Banner section with image and text block -->
     <div class="banner-container shadow-sm">
