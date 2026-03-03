@@ -812,8 +812,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        @foreach($topUsers as $user)
+                    @foreach($topUsers as $user)
+                        <tr>
                             <td><img src="{{ asset($user->photo) }}" 
                                 style="width:40px;height:40px;border-radius:50%;border:2px solid white;">
                             </td>
@@ -823,8 +823,8 @@
                                 {{ \Carbon\Carbon::parse($user->exam_date)->format('Y-m-d H:i') }}
 
                             </td>
-                        @endforeach
-                    </tr>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>

@@ -106,8 +106,9 @@ class FinallStudentController extends Controller
 
     // Set Certificate
     public function SetCertificate($id){
-        $result = FinalExamResult::with(['user', 'certificate'])->findOrFail($id);
-        return view('admin.backend.passed_students.set_certificate', compact('result'));
+        $result = FinalExamResult::with(['user', 'certificate','category'])->findOrFail($id);
+        return view('admin.backend.certificate.cer2', compact('result'));
+        // return view('admin.backend.passed_students.set_certificate', compact('result'));
     }
 
     // Store Certificate
